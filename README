@@ -8,9 +8,12 @@ I've implemented ssh, ftp and pop3 testing.
 
 This is a code from a python beginner so it may contains ugly code.
 
+Requisites: Paramiko, Redis, IPy
+
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Python Bruteforcer
+
 
 optional arguments:
   -h, --help            show this help message and exit
