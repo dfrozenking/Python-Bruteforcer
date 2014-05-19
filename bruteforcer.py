@@ -25,10 +25,6 @@ def BruteManager(proto, port):
 		
 		if (int(r_server.get("Option")) == 2):
 
-			host = r_server.get("File")
-
-			filelen = int(subprocess.check_output(["wc", "-l", str(r_server.get("File"))]).split()[0])
-
 			mylist = open(r_server.get("File")).read().splitlines()
 
 			for address in mylist:
@@ -60,7 +56,6 @@ def BruteManager(proto, port):
 			else:
 
 				scanners[proto][1](r_server.get("Host"), int(r_server.get("Port")))
-
 
 	elif (port != "" or "None" and proto in scanners):
 		if (int(r_server.get("Option")) == 1):
@@ -111,7 +106,7 @@ def ManualBrute():
 		sys.exit(0)
 
 
-parser = argparse.ArgumentParser(description="---== Python Bruteforcer ==---")
+parser = argparse.ArgumentParser(description="\n---== Python Bruteforcer ==---\n")
 parser.add_argument('-t', '--target',   dest='target', type=str, action='store', help='Server Address to Bruteforce')
 parser.add_argument('-f', '--file', dest='file', type=str, action='store', help="File with the server's addresses")
 parser.add_argument('-s', '--service', dest='protocol', type=str, action='store', help='Protocol to Bruteforce')

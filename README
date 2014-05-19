@@ -22,7 +22,7 @@ optional arguments:
   -p PORT, --port PORT  Service Port
 
 
-May be used passing commands:
+May be used by command (it's usefull for automated tests):
 
 ./bruteforcer.py -t 127.0.0.1 -s ssh
 

@@ -10,6 +10,7 @@ def log(msg):
 	return "%s Bruteforcer[%d]: %s" % (timestamp, os.getpid(), msg)
 	sys.stdout.flush()
 
+
 def generateAuthPair():
 	return (str(uuid.uuid4()), str(uuid.uuid4()))
 
@@ -74,9 +75,9 @@ def FTPBrute(host, port):
 	attempts = 80
 	scancurrentline = 0
 	
-	credentials = open('userpasslist.txt', 'r')
+	credentials = open('wordlist.txt', 'r')
 
-	scanfilelen = int(subprocess.check_output(["wc", "-l", "userpasslist.txt"]).split()[0])
+	scanfilelen = int(subprocess.check_output(["wc", "-l", "wordlist.txt"]).split()[0])
 
 	for attempt in range(0, attempts):
 
@@ -86,7 +87,7 @@ def FTPBrute(host, port):
 
 		else:
 
-			line = open('userpasslist.txt', 'r').readlines()[scancurrentline]
+			line = open('wordlist.txt', 'r').readlines()[scancurrentline]
 			line = line.rstrip('\n')
 			tstusername, tstpassword = line.split(', ')
 			scancurrentline += 1
@@ -128,9 +129,9 @@ def POPBrute(host, port):
 	attempts = 80
 	scancurrentline = 0
 	
-	credentials = open('userpasslist.txt', 'r')
+	credentials = open('wordlist.txt', 'r')
 
-	scanfilelen = int(subprocess.check_output(["wc", "-l", "userpasslist.txt"]).split()[0])
+	scanfilelen = int(subprocess.check_output(["wc", "-l", "wordlist.txt"]).split()[0])
 
 	for attempt in range(0, attempts):
 
@@ -140,7 +141,7 @@ def POPBrute(host, port):
 
 		else:
 
-			line = open('userpasslist.txt', 'r').readlines()[scancurrentline]
+			line = open('wordlist.txt', 'r').readlines()[scancurrentline]
 			line = line.rstrip('\n')
 			tstusername, tstpassword = line.split(',')
 			scancurrentline += 1
