@@ -5,3 +5,29 @@ This is a simple python bruteforcer that may be used to test your network / appl
 I've implemented ssh, ftp and pop3 testing.
 
 This is a code from a python beginner so it may contains ugly code.
+
+Python Bruteforcer
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -t TARGET, --target TARGET
+                        Server Address to Bruteforce
+  -f FILE, --file FILE  File with the server's addresses
+  -s PROTOCOL, --service PROTOCOL
+                        Protocol to Bruteforce
+  -p PORT, --port PORT  Service Port
+
+
+May be used passing commands:
+
+./bruteforcer.py -t 127.0.0.1 -s ssh
+
+or guided mode:
+
+---== Python Bruteforcer ==---
+
+Choose an option:
+1- Specific Bruteforce
+2- IP list Bruteforce
+
+Option:
