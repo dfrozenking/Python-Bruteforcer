@@ -1,0 +1,7 @@
+Python Bruteforcer
+
+This is a simple python bruteforcer that may be used to test your network / applications defense.
+
+I've implemented ssh, ftp and pop3 testing.
+
+This is a code from a python beginner so it may contains ugly code.
