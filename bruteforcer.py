@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import redis, argparse, sys, subprocess
 from bruteopt import SSHBrute, FTPBrute, POPBrute
+from IPy import IP
 
 
 r_server = redis.Redis("localhost")
@@ -16,7 +17,7 @@ def BruteManager(proto, port):
 	'pop3':[110, POPBrute]
 	}
 
-	if (port == "" or "None" and proto in scanners):
+	if (port == "" or port == "None" and proto in scanners):
 
 		r_server.set("Port", scanners[proto][0])
 
@@ -30,26 +31,62 @@ def BruteManager(proto, port):
 
 			mylist = open(r_server.get("File")).read().splitlines()
 
-			for server in mylist:
-				r_server.set("ActServer", server)
+			for address in mylist:
+				if ("/" in address):
+					iprange = IP(address)
+					for x in iprange:
 
-				if (r_server.get("LastServer") == r_server.get("ActServer")):
+						r_server.set("ActServer", x)
 
-					print "Server already scanned"
-					sys.exit(0)
+						if (r_server.get("LastServer") == r_server.get("ActServer")):
 
-				else:
+							print "Server already scanned"
+							sys.exit(0)
 
-					scanners[proto][1](r_server.get("ActServer"), int(r_server.get("Port")))
-					r_server.set("LastServer", r_server.get("ActServer"))
+						else:
 
+							scanners[proto][1](r_server.get("ActServer"), int(r_server.get("Port")))
+							r_server.set("LastServer", r_server.get("ActServer"))
+
+#			for server in mylist:
+#				r_server.set("ActServer", server)
+#
+#				if (r_server.get("LastServer") == r_server.get("ActServer")):
+#
+#					print "Server already scanned"
+#					sys.exit(0)
+#
+#				else:
+#
+#					scanners[proto][1](r_server.get("ActServer"), int(r_server.get("Port")))
+#					r_server.set("LastServer", r_server.get("ActServer"))
+#
 		else:
-			scanners[proto][1](r_server.get("Host"), int(r_server.get("Port")))
 
-	elif (port != "" and proto in scanners):
+			if ("/" in str(r_server.get("Host"))):
+
+				iprange = IP(str(r_server.get("Host")))
+
+				for x in iprange:
+					scanners[proto][1](x, int(r_server.get("Port")))
+
+			else:
+
+				scanners[proto][1](r_server.get("Host"), int(r_server.get("Port")))
+
+
+	elif (port != "" or "None" and proto in scanners):
 		if (int(r_server.get("Option")) == 1):
 
-			scanners[proto][1](r_server.get("Host"), int(r_server.get("Port")))
+			if ("/" in str(r_server.get("Host"))):
+
+				iprange = IP(str(r_server.get("Host")))
+
+				for x in iprange:
+					scanners[proto][1](x, int(r_server.get("Port")))
+			else:
+
+				scanners[proto][1](r_server.get("Host"), int(r_server.get("Port")))
 
 	else:
 		print "Invalid Protocol"
@@ -87,7 +124,7 @@ def ManualBrute():
 		sys.exit(0)
 
 
-parser = argparse.ArgumentParser(description="Python Bruteforcer")
+parser = argparse.ArgumentParser(description="---== Python Bruteforcer ==---")
 parser.add_argument('-t', '--target',   dest='target', type=str, action='store', help='Server Address to Bruteforce')
 parser.add_argument('-f', '--file', dest='file', type=str, action='store', help="File with the server's addresses")
 parser.add_argument('-s', '--service', dest='protocol', type=str, action='store', help='Protocol to Bruteforce')
@@ -110,7 +147,7 @@ elif (any(vars(args).values())):
 		print r_server.get("File")
 		sys.exit(0)
 
-	elif (r_server.get("Protocol") == "None"):
+	elif (r_server.get("Protocol") == "None" or ""):
 		print "\nYou need to specify the protocol"
 		sys.exit(0)
 

