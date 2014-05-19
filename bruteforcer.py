@@ -48,19 +48,6 @@ def BruteManager(proto, port):
 							scanners[proto][1](r_server.get("ActServer"), int(r_server.get("Port")))
 							r_server.set("LastServer", r_server.get("ActServer"))
 
-#			for server in mylist:
-#				r_server.set("ActServer", server)
-#
-#				if (r_server.get("LastServer") == r_server.get("ActServer")):
-#
-#					print "Server already scanned"
-#					sys.exit(0)
-#
-#				else:
-#
-#					scanners[proto][1](r_server.get("ActServer"), int(r_server.get("Port")))
-#					r_server.set("LastServer", r_server.get("ActServer"))
-#
 		else:
 
 			if ("/" in str(r_server.get("Host"))):
