@@ -4,9 +4,11 @@ from ftplib import FTP
 from poplib import POP3
 
 r_server = redis.Redis("localhost")
+attempts = 80
 
 def log(msg):
 	timestamp = datetime.datetime.now().strftime('%b %d %H:%M:%S')
+	r_server.set("LastLog", "%s Bruteforcer[%d]: %s" % (timestamp, os.getpid(), msg))
 	return "%s Bruteforcer[%d]: %s" % (timestamp, os.getpid(), msg)
 	sys.stdout.flush()
 
@@ -16,7 +18,7 @@ def generateAuthPair():
 
 
 def SSHBrute(host, port):
-	attempts = 80
+	
 	scancurrentline = 0
 	
 	credentials = open('wordlist.txt', 'r')
@@ -38,7 +40,15 @@ def SSHBrute(host, port):
 
 		attempt += 1
 
+		if (attempt > 50):
+			print "Host is accepting bruteforce attempts\n"
+			outfile2 = open("highattempt.txt", 'a')
+			outfile2.write(r_server.get("LastLog") + '\n')
+			outfile2.close()
+			break
+
 		print log("SSH Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
+
 
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -56,6 +66,10 @@ def SSHBrute(host, port):
 		except socket.timeout:
 			print log("Connection Timeout")
 			break
+		except socket.error as E:
+			if E.errno == 61:
+				print log("Connection refused")
+				break
 		except socket.error, error:
 			print error
 			continue
@@ -67,12 +81,12 @@ def SSHBrute(host, port):
 			print error
 			print "Unknown error: %s" % (error)
 		client.close()
+
 	credentials.close()
 
 
 def FTPBrute(host, port):
 
-	attempts = 80
 	scancurrentline = 0
 	
 	credentials = open('wordlist.txt', 'r')
@@ -93,6 +107,13 @@ def FTPBrute(host, port):
 			scancurrentline += 1
 
 		attempt += 1
+
+		if (attempt > 50):
+			print "Host is accepting bruteforce attempts\n"
+			outfile2 = open("highattempt.txt", 'a')
+			outfile2.write(r_server.get("LastLog") + '\n')
+			outfile2.close()
+			break
 
 		print log("FTP Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
 
@@ -126,7 +147,7 @@ def FTPBrute(host, port):
 
 
 def POPBrute(host, port):
-	attempts = 80
+
 	scancurrentline = 0
 	
 	credentials = open('wordlist.txt', 'r')
@@ -147,6 +168,13 @@ def POPBrute(host, port):
 			scancurrentline += 1
 
 		attempt += 1
+
+		if (attempt > 50):
+			print "Host is accepting bruteforce attempts\n"
+			outfile2 = open("highattempt.txt", 'a')
+			outfile2.write(r_server.get("LastLog") + '\n')
+			outfile2.close()
+			break
 
 		print log("FTP Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
 
