@@ -111,6 +111,7 @@ parser.add_argument('-t', '--target',   dest='target', type=str, action='store',
 parser.add_argument('-f', '--file', dest='file', type=str, action='store', help="File with the server's addresses")
 parser.add_argument('-s', '--service', dest='protocol', type=str, action='store', help='Protocol to Bruteforce')
 parser.add_argument('-p', '--port', dest='port', type=int, action='store', help='Service Port')
+parser.add_argument('-d', '--delay', dest='delay', type=int, action='store', help='Delay between bruteforce attempts')
 
 args = parser.parse_args()
 
@@ -122,6 +123,7 @@ elif (any(vars(args).values())):
 	r_server.set("Host", args.target)
 	r_server.set("Protocol", args.protocol)
 	r_server.set("Port", args.port)
+	r_server.set("Delay", args.delay)
 
 	if (r_server.get("Host") != "None" and r_server.get("File") != "None"):
 		print "\nYou used both options -t and -f, you must specify only one"

